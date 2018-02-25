@@ -40,7 +40,14 @@ function glsl_to_any () {
   # Split .glsl shader file into .vert and .frag
   $GLSL_TO_STAGES_EXEC $_SHD_SRC_FILE $_SHD_OUT_DIR/$_SHD_NAME.vert $_SHD_OUT_DIR/$_SHD_NAME.frag
 
-  local _SHD_SRC_LANG="300es" # TODO: get from source .glsl file
+  local _SHD_SRC_LANG="300es" 
+  
+  # Get source shader language from source .glsl file
+  local GLSL_LANG=($( cat $SHD_SRC_FILE | grep "@program" ))
+  local GLSL_LANG=${GLSL_LANG[1]}
+  if [ -n "$GLSL_LANG" ]; then
+    _SHD_SRC_LANG=$GLSL_LANG
+  fi
 
   # create output directory if doesnt exist
   mkdir -p $_SHD_OUT_DIR/$_SHD_OUT_LANG

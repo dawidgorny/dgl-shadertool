@@ -25,7 +25,7 @@ const outputFragFilepath = path.resolve(process.cwd(), args[2])
 
 const blocks = {}
 
-var glslLang = validGlslLang[0]
+var glslLang = ''
 var programName = path.basename(inputFilepath, '.glsl')
 var vsBlock = null
 var fsBlock = null
