@@ -1,0 +1,29 @@
+{
+	"stage":	"vs",
+	"uniform_blocks":	[{
+			"type":	"params",
+			"name":	"_14",
+			"slot":	0,
+			"size":	64,
+			"members":	[{
+					"name":	"uMVP",
+					"type":	"mat4",
+					"num":	1,
+					"offset":	0
+				}]
+		}],
+	"textures":	[],
+	"inputs":	[{
+			"name":	"position",
+			"type":	"vec4",
+			"slot":	0
+		}, {
+			"name":	"normal",
+			"type":	"vec3",
+			"slot":	1
+		}],
+	"outputs":	[{
+			"name":	"vNormal",
+			"type":	"vec3"
+		}]
+}

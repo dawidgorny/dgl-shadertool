@@ -1,0 +1,13 @@
+{
+	"stage":	"fs",
+	"uniform_blocks":	[],
+	"textures":	[],
+	"inputs":	[{
+			"name":	"color",
+			"type":	"vec4"
+		}],
+	"outputs":	[{
+			"name":	"fragColor",
+			"type":	"vec4"
+		}]
+}

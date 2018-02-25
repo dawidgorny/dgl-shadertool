@@ -1,0 +1,145 @@
+#!/usr/local/bin/node
+
+const fs = require('fs')
+const path = require('path')
+const readline = require('linebyline')
+
+const validGlslLang = ['glsl300', 'glsl310', 'glsl300es', 'glsl310es']
+const glslLangPepend = {
+  'glsl300': `#version 300`,
+  'glsl310': `#version 310`,
+  'glsl300es': `#version 300 es`,
+  'glsl310es': `#version 310 es`
+}
+
+const args = process.argv.slice(2)
+
+if (args.length < 3) {
+  console.info(`Usage: glsl_to_stages input.glsl output.vert output.frag\n`)
+  process.exit()
+}
+
+const inputFilepath = path.resolve(process.cwd(), args[0])
+const outputVertFilepath = path.resolve(process.cwd(), args[1])
+const outputFragFilepath = path.resolve(process.cwd(), args[2])
+
+const blocks = {}
+
+var glslLang = validGlslLang[0]
+var programName = path.basename(inputFilepath, '.glsl')
+var vsBlock = null
+var fsBlock = null
+
+const tags = {
+  VS_BEGIN: '@vs',
+  FS_BEGIN: '@fs',
+  END: '@end',
+  PROGRAM: '@program'
+}
+
+var openBlock = null
+
+var lineReader = readline(inputFilepath)
+
+var lineNum = 1
+lineReader.on('line', (line) => {
+  // console.log('Line from file:', line)
+  var parts = line.trim().split(' ')
+  if (parts.length > 0) {
+    const tag = parts[0].trim()
+    const isTag = (tag[0] === '@')
+
+    if (tag === tags.VS_BEGIN) {
+      if (openBlock) {
+        throw new Error(`Expected ${tags.END} tag. Line ${lineNum}`)
+      }
+      let blockName = (parts.length > 1) ? parts[1].trim() : `block${Object.keys(blocks).length}`
+      blocks[blockName] = {
+        type: 'vert',
+        content: ''
+      }
+      openBlock = blocks[blockName]
+    } else if (tag === tags.FS_BEGIN) {
+      if (openBlock) {
+        throw new Error(`Expected ${tags.END} tag. Line ${lineNum}`)
+      }
+      let blockName = (parts.length > 1) ? parts[1].trim() : `block${Object.keys(blocks).length}`
+      blocks[blockName] = {
+        type: 'frag',
+        content: ''
+      }
+      openBlock = blocks[blockName]
+    } else if (tag === tags.PROGRAM) {
+      if (openBlock) {
+        throw new Error(`Expected ${tags.END} tag. Line ${lineNum}`)
+      }
+      if (parts.length > 1) {
+        glslLang = parts[1].trim()
+      }
+      if (parts.length > 2) {
+        programName = parts[2].trim()
+      }
+      if (parts.length > 3) {
+        vsBlock = parts[3].trim()
+      }
+      if (parts.length > 4) {
+        fsBlock = parts[4].trim()
+      }
+    } else if (tag === tags.END) {
+      if (!openBlock) {
+        throw new Error(`No open block to apply ${tags.END} tag. Line ${lineNum}`)
+      }
+      openBlock = null
+    } else if (isTag) {
+      throw new Error(`Unknown tag: ${tags.END} . Line ${lineNum}`)
+    } else {
+      if (openBlock) {
+        openBlock.content += line + '\n'
+      }
+    }
+  }
+  lineNum++
+})
+
+lineReader.on('end', () => {
+  if (!vsBlock) {
+    for (let blockName of Object.keys(blocks)) {
+      if (blocks[blockName].type === 'vert') {
+        vsBlock = blockName
+      }
+    }
+  }
+
+  if (!fsBlock) {
+    for (let blockName of Object.keys(blocks)) {
+      if (blocks[blockName].type === 'frag') {
+        fsBlock = blockName
+      }
+    }
+  }
+
+  // validate glsl language name
+  if (!validGlslLang.find((v) => v === glslLang)) {
+    throw new Error(`Invalid GLSL language signature. Supported: ${validGlslLang.toString()}`)
+  }
+
+  // check if blocks exist
+  if (!blocks.hasOwnProperty(vsBlock)) {
+    throw new Error('Vertex shader block not found.')
+  }
+  if (!blocks.hasOwnProperty(fsBlock)) {
+    throw new Error('Fragment shader block not found.')
+  }
+
+  fs.writeFile(outputVertFilepath, glslLangPepend[glslLang] + '\n' + blocks[vsBlock].content, (err) => {
+    if (err) {
+      console.error(err.message)
+    }
+  })
+
+  fs.writeFile(outputFragFilepath, glslLangPepend[glslLang] + '\n' + blocks[fsBlock].content, (err) => {
+    if (err) {
+      console.error(err.message)
+    }
+  })
+})

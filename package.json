@@ -1,0 +1,23 @@
+{
+  "name": "dgl-shadertool",
+  "version": "1.0.0",
+  "description": "",
+  "main": "",
+  "directories": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dawidgorny/dgl-shadertool.git"
+  },
+  "author": "Dawid Górny",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dawidgorny/dgl-shadertool/issues"
+  },
+  "homepage": "https://github.com/dawidgorny/dgl-shadertool#readme",
+  "dependencies": {
+    "linebyline": "^1.3.0"
+  }
+}

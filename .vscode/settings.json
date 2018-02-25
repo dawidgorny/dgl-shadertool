@@ -1,0 +1,23 @@
+{
+  "files.associations": {
+    "stdexcept": "cpp",
+    "string": "cpp",
+    "__functional_03": "cpp",
+    "__string": "cpp",
+    "deque": "cpp",
+    "functional": "cpp",
+    "system_error": "cpp",
+    "vector": "cpp",
+    "__split_buffer": "cpp",
+    "iterator": "cpp",
+    "map": "cpp",
+    "set": "cpp",
+    "stack": "cpp",
+    "string_view": "cpp",
+    "unordered_map": "cpp",
+    "unordered_set": "cpp",
+    "typeinfo": "cpp",
+    "__bit_reference": "cpp",
+    "bitset": "cpp"
+  }
+}
